@@ -1,0 +1,28 @@
+package io.github.trueangle.cocktail.ui
+
+import androidx.compose.runtime.Immutable
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.createSavedStateHandle
+import androidx.lifecycle.viewmodel.CreationExtras
+import io.github.trueangle.cocktail.domain.repository.DrinkRepository
+import io.github.trueangle.cocktail.ui.categories.CategoriesViewModel
+import javax.inject.Inject
+import javax.inject.Singleton
+
+@[Singleton Immutable]
+class AppViewModelFactory @Inject constructor(
+    private val drinkRepository: DrinkRepository
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T = when {
+        /*   modelClass.isAssignableFrom(CategoriesViewModel::class.java) -> CategoriesViewModel(
+               drinkRepository
+           ) as T
+   */
+        else -> CategoriesViewModel(
+            savedStateHandle = extras.createSavedStateHandle(),
+            drinkRepository = drinkRepository
+        ) as T
+
+    }
+}
