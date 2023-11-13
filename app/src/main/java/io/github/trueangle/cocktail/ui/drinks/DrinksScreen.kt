@@ -1,6 +1,5 @@
-package io.github.trueangle.cocktail.ui.categories
+package io.github.trueangle.cocktail.ui.drinks
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -21,7 +20,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -29,58 +27,29 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import io.github.trueangle.cocktail.design.AppBar
 import io.github.trueangle.cocktail.design.ErrorView
-import io.github.trueangle.cocktail.domain.model.Category
+import io.github.trueangle.cocktail.domain.model.Drink
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CategoriesScreen(
+fun DrinksScreen(
     modifier: Modifier,
-    vm: CategoriesViewModel,
-    onItemClick: (Category) -> Unit
+    vm: DrinksViewModel,
+    onItemClick: (Drink) -> Unit,
+    onNavUp: () -> Unit
 ) {
     val state by vm.stateFlow.collectAsStateWithLifecycle()
 
     Scaffold(modifier = modifier, topBar = {
-        //AppBar(title = "Categories")
-
-        SearchBar(
-            query = "",
-            onQueryChange = {},
-            placeholder = {
-                Text(text = "Search cocktail by name")
-            },
-            onSearch = {}, //the callback to be invoked when the input service triggers the ImeAction.Search action
-            active = false, //whether the user is searching or not
-            onActiveChange = { }, //the callback to be invoked when this search bar's active state is changed
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-
-            // todo
-            LazyColumn {
-                items(10) { country ->
-                    Text(
-                        text = "Cocktail",
-                        modifier = Modifier.padding(
-                            start = 8.dp,
-                            top = 4.dp,
-                            end = 8.dp,
-                            bottom = 4.dp
-                        )
-                    )
-                }
-            }
-        }
+        AppBar(title = state.categoryName, onNavUp = onNavUp)
     }) {
         Content(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = it.calculateTopPadding()),
             state = state,
-            onReload = { vm.dispatch(CategoriesIntent.OnRetry) },
+            onReload = { vm.dispatch(DrinksIntent.OnRetry) },
             onItemClick = onItemClick
         )
     }
@@ -89,11 +58,10 @@ fun CategoriesScreen(
 @Composable
 private fun Content(
     modifier: Modifier,
-    state: CategoriesState,
+    state: DrinksState,
     onReload: () -> Unit,
-    onItemClick: (Category) -> Unit
+    onItemClick: (Drink) -> Unit
 ) {
-
     when {
         state.progress -> {
             Box(
@@ -115,18 +83,8 @@ private fun Content(
         )
 
         else -> LazyColumn(modifier = modifier, contentPadding = PaddingValues(16.dp)) {
-            item {
-                Text(text = "Categories", style = MaterialTheme.typography.titleLarge)
-            }
-
-            item { Spacer(modifier = Modifier.size(16.dp)) }
-
-            items(state.list) { cat ->
-                CategoryItem(
-                    modifier = Modifier.fillMaxWidth(),
-                    category = cat,
-                    onClick = onItemClick
-                )
+            items(state.list) {
+                DrinkItem(modifier = Modifier.fillMaxWidth(), drink = it, onItemClick)
                 Spacer(modifier = Modifier.size(8.dp))
             }
         }
@@ -134,9 +92,9 @@ private fun Content(
 }
 
 @Composable
-private fun CategoryItem(modifier: Modifier, category: Category, onClick: (Category) -> Unit) {
+private fun DrinkItem(modifier: Modifier, drink: Drink, onItemClick: (Drink) -> Unit) {
     Card(
-        modifier = modifier.clickable { onClick(category) },
+        modifier = modifier.clickable { onItemClick(drink) },
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.2F)
         )
@@ -144,12 +102,12 @@ private fun CategoryItem(modifier: Modifier, category: Category, onClick: (Categ
         Row(modifier = modifier.padding(16.dp)) {
             Text(
                 modifier = Modifier.weight(1F),
-                text = category.name,
+                text = drink.name,
                 style = MaterialTheme.typography.titleMedium
             )
             Icon(
                 imageVector = Icons.Outlined.KeyboardArrowRight,
-                contentDescription = "Open ${category.name}"
+                contentDescription = "Open ${drink.name}"
             )
         }
     }
