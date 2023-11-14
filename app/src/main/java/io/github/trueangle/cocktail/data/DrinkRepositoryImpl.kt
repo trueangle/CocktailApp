@@ -18,6 +18,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -64,6 +65,11 @@ class DrinkRepositoryImpl @Inject constructor(
                     }
                 }
             }
+
+    override fun getFavorites(): Flow<List<Drink>?> =
+        drinkDao
+            .getFavorites()
+            .map { entities -> entities?.map { it.toDomainModel() } }
 
     private suspend fun getDrinkFromServer(id: String): Result<DrinkEntity, RequestException> =
         resultBodyOf {

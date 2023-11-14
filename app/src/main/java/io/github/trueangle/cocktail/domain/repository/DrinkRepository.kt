@@ -12,5 +12,8 @@ interface DrinkRepository {
     suspend fun getDrinksByCategoryName(name: String): Result<List<Drink>, RequestException>
 
     fun getDrinkById(id: String): Flow<Result<Drink, RequestException>>
+
+    fun getFavorites() : Flow<List<Drink>?>
+
     suspend fun updateDrink(drink: Drink)
 }

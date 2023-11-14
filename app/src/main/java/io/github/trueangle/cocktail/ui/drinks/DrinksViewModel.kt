@@ -47,14 +47,14 @@ class DrinksViewModel(
     }
 
     init {
-        loadDrinks()
+        getDrinks()
     }
 
     override fun dispatch(intent: DrinksIntent) {
-
+        // todo
     }
 
-    private fun loadDrinks() {
+    private fun getDrinks() {
         viewModelScope.launch {
             viewState = viewState.copy(progress = true, error = null)
 

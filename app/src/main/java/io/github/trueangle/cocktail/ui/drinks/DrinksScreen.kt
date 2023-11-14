@@ -118,7 +118,7 @@ private fun Content(
 }
 
 @Composable
-private fun DrinkListItem(modifier: Modifier, Drink: Drink, onItemClick: (Drink) -> Unit) {
+fun DrinkListItem(modifier: Modifier, Drink: Drink, onItemClick: (Drink) -> Unit) {
     Card(
         modifier = modifier.clickable { onItemClick(Drink) },
         colors = CardDefaults.cardColors(

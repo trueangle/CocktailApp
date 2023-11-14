@@ -9,6 +9,7 @@ import io.github.trueangle.cocktail.domain.repository.DrinkRepository
 import io.github.trueangle.cocktail.ui.categories.CategoriesViewModel
 import io.github.trueangle.cocktail.ui.drinkdetail.DrinkDetailViewModel
 import io.github.trueangle.cocktail.ui.drinks.DrinksViewModel
+import io.github.trueangle.cocktail.ui.favorites.FavoritesViewModel
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -24,6 +25,10 @@ class AppViewModelFactory @Inject constructor(
 
         modelClass.isAssignableFrom(DrinkDetailViewModel::class.java) -> DrinkDetailViewModel(
             savedStateHandle = extras.createSavedStateHandle(),
+            drinkRepository = drinkRepository
+        ) as T
+
+        modelClass.isAssignableFrom(FavoritesViewModel::class.java) -> FavoritesViewModel(
             drinkRepository = drinkRepository
         ) as T
 
