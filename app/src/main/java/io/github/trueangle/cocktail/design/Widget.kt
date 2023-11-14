@@ -30,7 +30,7 @@ fun AppBar(
     scrollBehavior: TopAppBarScrollBehavior? = null,
     onNavUp: (() -> Unit)? = null
 ) {
-    LargeTopAppBar(
+    MediumTopAppBar(
         modifier = modifier,
         title = {
             Text(
@@ -49,7 +49,6 @@ fun AppBar(
                     Icon(
                         imageVector = Icons.Filled.ArrowBack,
                         contentDescription = "Navigate up",
-                        //tint = MaterialTheme.colorScheme.onSurface.copy(0.6F)
                     )
                 }
             }

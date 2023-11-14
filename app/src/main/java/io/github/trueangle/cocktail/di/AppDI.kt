@@ -1,6 +1,7 @@
 package io.github.trueangle.cocktail.di
 
 import android.content.Context
+import androidx.room.Room
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Binds
 import dagger.Component
@@ -8,6 +9,7 @@ import dagger.Module
 import dagger.Provides
 import io.github.trueangle.cocktail.data.DrinkRepositoryImpl
 import io.github.trueangle.cocktail.data.DrinksApi
+import io.github.trueangle.cocktail.data.db.DrinksDatabase
 import io.github.trueangle.cocktail.domain.repository.DrinkRepository
 import io.github.trueangle.cocktail.ui.AppViewModelFactory
 import kotlinx.serialization.json.Json
@@ -43,12 +45,23 @@ interface AppComponent {
 interface AppModule {
     @[Binds Singleton]
     fun bindDrinkRepos(impl: DrinkRepositoryImpl): DrinkRepository
+
+    companion object {
+        @[Provides Singleton]
+        fun provideRoom(context: Context) =
+            Room
+                .databaseBuilder(context, DrinksDatabase::class.java, "drinks_db")
+                .build()
+
+        @[Provides Singleton]
+        fun provideDrinkDao(db: DrinksDatabase) = db.drinkDao()
+    }
 }
 
 @Module
 object NetworkModule {
     private const val BASE_URL = "https://www.thecocktaildb.com/api/json/"
-    private const val CONTENT_TYPE_PATH = "application/json"
+    private const val CONTENT_TYPE = "application/json"
 
     @[Provides Singleton]
     fun retrofitApi(
@@ -71,7 +84,7 @@ object NetworkModule {
 
     @[Provides Singleton]
     fun provideJsonConverterFactory(): Converter.Factory =
-        Json { ignoreUnknownKeys = true }.asConverterFactory(CONTENT_TYPE_PATH.toMediaType())
+        Json { ignoreUnknownKeys = true }.asConverterFactory(CONTENT_TYPE.toMediaType())
 }
 
 

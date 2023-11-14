@@ -22,12 +22,14 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import io.github.trueangle.cocktail.ui.AppViewModelFactory
 import io.github.trueangle.cocktail.ui.categories.CategoriesScreen
+import io.github.trueangle.cocktail.ui.drinkdetail.DrinkDetailScreen
 import io.github.trueangle.cocktail.ui.drinks.DrinksScreen
 import io.github.trueangle.cocktail.util.encodeUrl
 
 enum class HomeRoutes(val route: String) {
     Categories("home/categories"),
     Drinks("home/drinks/{categoryName}"),
+    DrinkDetail("home/drink/{id}"),
     Favorites("home/favorites"),
 }
 
@@ -40,6 +42,7 @@ fun HomeScreen(modifier: Modifier, appViewModelFactory: AppViewModelFactory) {
         modifier = modifier,
         bottomBar = { HomeBottomBar() }
     ) {
+
         NavHost(
             modifier = Modifier.padding(bottom = it.calculateBottomPadding()),
             navController = navController,
@@ -56,6 +59,19 @@ fun HomeScreen(modifier: Modifier, appViewModelFactory: AppViewModelFactory) {
                 }
             }
 
+            composable(
+                route = HomeRoutes.DrinkDetail.route,
+                arguments = listOf(navArgument("id") { type = NavType.StringType })
+
+            ) {
+                DrinkDetailScreen(
+                    modifier = Modifier.fillMaxSize(),
+                    vm = viewModel(factory = appViewModelFactory),
+                ) {
+                    navController.popBackStack()
+                }
+            }
+
             composable(route = HomeRoutes.Favorites.route) {
 
             }
@@ -67,8 +83,9 @@ fun HomeScreen(modifier: Modifier, appViewModelFactory: AppViewModelFactory) {
                 DrinksScreen(
                     modifier = Modifier.fillMaxSize(),
                     vm = viewModel(factory = appViewModelFactory),
-                    onItemClick = {
-
+                    onItemClick = { drink ->
+                        // todo
+                        navController.navigate("home/drink/${drink.id}")
                     },
                     onNavUp = navController::popBackStack
                 )

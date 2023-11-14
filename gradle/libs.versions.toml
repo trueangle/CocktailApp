@@ -20,6 +20,7 @@ retrofit-serialization = "1.0.0"
 coil = "2.4.0"
 dagger-android = "2.48.1"
 result = "5.5.0"
+room = "2.6.0"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -54,6 +55,10 @@ dagger-processor = { module = "com.google.dagger:dagger-android-processor", vers
 dagger-compiler = { module = "com.google.dagger:dagger-compiler", version.ref = "dagger-android" }
 
 result = { module = "com.github.kittinunf.result:result-jvm", version.ref = "result" }
+
+room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
+room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 
 [plugins]
 com-android-application = { id = "com.android.application", version.ref = "agp" }
