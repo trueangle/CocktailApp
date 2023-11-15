@@ -15,4 +15,7 @@ interface DrinksApi {
 
     @GET("v1/1/lookup.php")
     suspend fun getDrinkById(@Query("i") id: String): DrinkDetailResponse
+
+    @GET("v1/1/search.php")
+    suspend fun searchByName(@Query("s") query: String): DrinkDetailResponse
 }

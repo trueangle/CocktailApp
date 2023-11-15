@@ -52,7 +52,7 @@ class DrinkDetailViewModel(
         when (intent) {
             DrinkDetailIntent.OnFavoriteClick -> viewModelScope.launch {
                 val drink = viewState.drink ?: return@launch
-                drinkRepository.updateDrink(drink.copy(favorite = !drink.favorite))
+                drinkRepository.update(drink.copy(favorite = !drink.favorite))
             }
 
             DrinkDetailIntent.OnRetry -> getDrink()
@@ -65,7 +65,7 @@ class DrinkDetailViewModel(
             viewState = viewState.copy(progress = true, error = null)
 
             drinkRepository
-                .getDrinkById(viewState.id)
+                .getById(viewState.id)
                 .flowOn(Dispatchers.IO)
                 .collectLatest { result ->
                     Log.d("collect", result.toString())

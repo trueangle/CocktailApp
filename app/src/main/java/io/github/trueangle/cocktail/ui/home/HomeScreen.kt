@@ -65,11 +65,15 @@ fun HomeScreen(modifier: Modifier, appViewModelFactory: AppViewModelFactory) {
                 composable(route = HomeRoutes.Categories.route) {
                     CategoriesScreen(
                         modifier = Modifier.fillMaxSize(),
-                        vm = viewModel(factory = appViewModelFactory)
-                    ) { cat ->
-                        // todo
-                        navController.navigate("home/drinks/${cat.name.encodeUrl()}")
-                    }
+                        vm = viewModel(factory = appViewModelFactory),
+                        onItemClick = { cat ->
+                            // todo
+                            navController.navigate("home/drinks/${cat.name.encodeUrl()}")
+                        },
+                        onSearchItemClick = { drink ->
+                            navController.navigate("home/drink/${drink.id}")
+                        }
+                    )
                 }
 
                 composable(
@@ -148,10 +152,4 @@ private fun HomeBottomBar(navController: NavController) {
             label = { Text(text = "Favorites") }
         )
     }
-}
-
-@Preview
-@Composable
-private fun HomePreview() {
-
 }

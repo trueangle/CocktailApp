@@ -1,5 +1,7 @@
 package io.github.trueangle.cocktail.util
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.github.kittinunf.result.Result
 import com.github.kittinunf.result.mapError
 import io.github.trueangle.cocktail.domain.model.RequestException
@@ -23,3 +25,12 @@ suspend fun Throwable.toRequestException() = when (this) {
 
 fun String.encodeUrl() = URLEncoder.encode(this, "utf-8")
 fun String.decodeUrl() = URLDecoder.decode(this, "utf-8")
+
+inline fun <V : ViewModel> viewModelFactory(crossinline creator: () -> V): ViewModelProvider.Factory {
+    return object : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            @Suppress("UNCHECKED_CAST")
+            return creator() as T
+        }
+    }
+}

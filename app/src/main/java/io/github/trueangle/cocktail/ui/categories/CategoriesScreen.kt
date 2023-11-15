@@ -17,11 +17,9 @@ import androidx.compose.material.icons.outlined.KeyboardArrowRight
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -31,49 +29,22 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.trueangle.cocktail.design.ErrorView
 import io.github.trueangle.cocktail.domain.model.Category
+import io.github.trueangle.cocktail.domain.model.Drink
+import io.github.trueangle.cocktail.domain.model.SearchSource
+import io.github.trueangle.cocktail.ui.search.Search
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoriesScreen(
     modifier: Modifier,
     vm: CategoriesViewModel,
-    onItemClick: (Category) -> Unit
+    onItemClick: (Category) -> Unit,
+    onSearchItemClick: (Drink) -> Unit
 ) {
     val state by vm.stateFlow.collectAsStateWithLifecycle()
 
     Scaffold(modifier = modifier, topBar = {
-        //AppBar(title = "Categories")
-
-        SearchBar(
-            query = "",
-            onQueryChange = {},
-            placeholder = {
-                Text(text = "Search cocktail by name")
-            },
-            onSearch = {}, //the callback to be invoked when the input service triggers the ImeAction.Search action
-            active = false, //whether the user is searching or not
-            onActiveChange = { }, //the callback to be invoked when this search bar's active state is changed
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-
-            // todo
-            LazyColumn {
-                items(10) { country ->
-                    Text(
-                        text = "Cocktail",
-                        modifier = Modifier.padding(
-                            start = 8.dp,
-                            top = 4.dp,
-                            end = 8.dp,
-                            bottom = 4.dp
-                        )
-                    )
-                }
-            }
-        }
+        Search(onItemClick = onSearchItemClick, source = SearchSource.NETWORK)
     }) {
         Content(
             modifier = Modifier
@@ -93,7 +64,6 @@ private fun Content(
     onReload: () -> Unit,
     onItemClick: (Category) -> Unit
 ) {
-
     when {
         state.progress -> {
             Box(
@@ -115,11 +85,9 @@ private fun Content(
         )
 
         else -> LazyColumn(modifier = modifier, contentPadding = PaddingValues(16.dp)) {
-            item {
-                Text(text = "Categories", style = MaterialTheme.typography.titleLarge)
-            }
+            item { Text(text = "Categories", style = MaterialTheme.typography.titleLarge) }
 
-            item { Spacer(modifier = Modifier.size(16.dp)) }
+            item { Spacer(modifier = Modifier.size(18.dp)) }
 
             items(state.list) { cat ->
                 CategoryItem(

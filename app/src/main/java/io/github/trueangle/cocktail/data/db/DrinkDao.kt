@@ -17,4 +17,7 @@ interface DrinkDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(drinkEntity: DrinkEntity)
+
+    @Query("SELECT * FROM drinks WHERE favorite == 1 AND name LIKE '%' || :query || '%'")
+    fun searchByName(query: String): List<DrinkEntity>
 }

@@ -5,13 +5,14 @@ import com.github.kittinunf.result.Result
 import com.github.kittinunf.result.isSuccess
 import com.github.kittinunf.result.map
 import io.github.trueangle.cocktail.data.api.model.toDomainModels
-import io.github.trueangle.cocktail.data.api.model.toEntity
+import io.github.trueangle.cocktail.data.api.model.toEntityList
 import io.github.trueangle.cocktail.data.db.DrinkDao
 import io.github.trueangle.cocktail.data.db.entity.DrinkEntity
 import io.github.trueangle.cocktail.data.db.entity.toDomainModel
 import io.github.trueangle.cocktail.data.db.entity.toEntity
 import io.github.trueangle.cocktail.domain.model.Drink
 import io.github.trueangle.cocktail.domain.model.RequestException
+import io.github.trueangle.cocktail.domain.model.SearchSource
 import io.github.trueangle.cocktail.domain.repository.DrinkRepository
 import io.github.trueangle.cocktail.util.resultBodyOf
 import kotlinx.coroutines.Dispatchers
@@ -32,18 +33,32 @@ class DrinkRepositoryImpl @Inject constructor(
         api.getCategories().toDomainModels()
     }
 
-    override suspend fun getDrinksByCategoryName(name: String) =
+    override suspend fun getByCategoryName(name: String) =
         resultBodyOf {
             api.getDrinksByCategoryName(name).toDomainModels(categoryName = name)
         }
 
-    override suspend fun updateDrink(drink: Drink) {
+    override suspend fun update(drink: Drink) {
         withContext(Dispatchers.IO) {
             drinkDao.insert(drink.toEntity())
         }
     }
 
-    override fun getDrinkById(id: String): Flow<Result<Drink, RequestException>> =
+    override suspend fun searchByName(
+        query: String,
+        source: SearchSource
+    ): Result<List<Drink>, RequestException> = when (source) {
+        SearchSource.NETWORK -> resultBodyOf {
+            api
+                .searchByName(query)
+                .toEntityList()
+                .map { it.toDomainModel() }
+        }
+
+        SearchSource.LOCAL -> Result.of { drinkDao.searchByName(query).map { it.toDomainModel() } }
+    }
+
+    override fun getById(id: String): Flow<Result<Drink, RequestException>> =
         drinkDao
             .getById(id)
             .flatMapLatest {
@@ -75,9 +90,8 @@ class DrinkRepositoryImpl @Inject constructor(
         resultBodyOf {
             api
                 .getDrinkById(id)
-                .drinks
+                .toEntityList()
                 .first()
-                .toEntity()
         }
 }
 

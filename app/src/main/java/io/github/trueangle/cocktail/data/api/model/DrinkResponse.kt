@@ -10,7 +10,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class DrinkDetailResponse(
     @SerialName("drinks")
-    val drinks: List<Map<String, String?>>
+    val drinks: List<Map<String, String?>>?
 )
 
 @Serializable
@@ -34,7 +34,9 @@ fun DrinkResponse.toDomainModel(categoryName: String) = Drink(
     type = null
 )
 
-fun Map<String, String?>.toEntity(): DrinkEntity {
+fun DrinkDetailResponse.toEntityList() = drinks?.map { it.toEntity() }.orEmpty()
+
+private fun Map<String, String?>.toEntity(): DrinkEntity {
     val ingredientList = entries
         .asSequence()
         .filter { it.key.startsWith("strIngredient") && it.value != null }

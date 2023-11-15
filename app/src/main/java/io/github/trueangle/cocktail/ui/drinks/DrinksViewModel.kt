@@ -28,7 +28,6 @@ data class DrinksState(
 ) : State
 
 sealed interface DrinksIntent : Intent {
-    data class OnClick(val cat: Category) : DrinksIntent
     data object OnRetry : DrinksIntent
 }
 
@@ -51,21 +50,21 @@ class DrinksViewModel(
     }
 
     override fun dispatch(intent: DrinksIntent) {
-        // todo
+        when (intent) {
+            DrinksIntent.OnRetry -> getDrinks()
+        }
     }
 
     private fun getDrinks() {
-        viewModelScope.launch {
-            viewState = viewState.copy(progress = true, error = null)
-
-            withContext(Dispatchers.IO) {
-                drinkRepository.getDrinksByCategoryName(viewState.categoryName)
-            }.onSuccess {
-                viewState =
-                    viewState.copy(progress = false, error = null, list = it.toPersistentList())
-            }.onFailure {
-                viewState = viewState.copy(progress = false, error = it)
-            }
+        viewState = viewState.copy(progress = true, error = null)
+        viewModelScope.launch(Dispatchers.IO) {
+            drinkRepository.getByCategoryName(viewState.categoryName)
+                .onSuccess {
+                    viewState =
+                        viewState.copy(progress = false, error = null, list = it.toPersistentList())
+                }.onFailure {
+                    viewState = viewState.copy(progress = false, error = it)
+                }
         }
     }
 }
