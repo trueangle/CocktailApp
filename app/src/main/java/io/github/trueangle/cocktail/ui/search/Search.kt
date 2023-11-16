@@ -55,10 +55,12 @@ fun Search(
     source: SearchSource,
     placeholder: String
 ) {
-    val appComponent = (LocalContext.current.applicationContext as CocktailApplication).appComponent
+    val context = LocalContext.current
+    
     val vm = viewModel<SearchViewModel>(
         key = "searchViewModel${source.name}",
         factory = viewModelFactory {
+            val appComponent = (context.applicationContext as CocktailApplication).appComponent
             SearchViewModel(drinkRepository = appComponent.drinkRepository, source)
         })
 

@@ -1,7 +1,9 @@
 package io.github.trueangle.cocktail.domain.model
 
+import androidx.compose.runtime.Stable
 import kotlinx.collections.immutable.ImmutableList
 
+@Stable
 data class Drink(
     val id: String,
     val thumbUrl: String,
@@ -15,6 +17,7 @@ data class Drink(
     val type: String?
 )
 
+@Stable
 data class Ingredient(
     val name: String,
     val measure: String
