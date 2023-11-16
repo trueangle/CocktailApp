@@ -1,5 +1,6 @@
 package io.github.trueangle.cocktail.ui.drinkdetail
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -50,8 +51,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import io.github.trueangle.cocktail.design.ErrorView
+import io.github.trueangle.cocktail.design.shimmerBrush
 import io.github.trueangle.cocktail.domain.model.Drink
 import io.github.trueangle.cocktail.domain.model.Ingredient
 
@@ -82,7 +85,7 @@ fun DrinkDetailScreen(modifier: Modifier, vm: DrinkDetailViewModel, onNavUp: () 
                         Icon(
                             imageVector = Icons.Outlined.Star,
                             contentDescription = null,
-                            tint = if (state.drink?.favorite == true) MaterialTheme.colorScheme.tertiary else Color.Gray
+                            tint = if (state.drink?.favorite == true) MaterialTheme.colorScheme.primary else Color.Gray.copy(alpha = 0.6F)
                         )
                     }
                 }
@@ -161,22 +164,26 @@ private fun Content(modifier: Modifier, drink: Drink, onFavoriteClick: () -> Uni
 
         Spacer(modifier = Modifier.size(16.dp))
 
-        AsyncImage(
+        val imageModifier = Modifier
+            .padding(horizontal = 16.dp)
+            .height(350.dp)
+            .fillMaxWidth()
+
+        SubcomposeAsyncImage(
             model = ImageRequest
                 .Builder(LocalContext.current)
                 .data(drink.thumbUrl)
                 .crossfade(true)
                 .build(),
             contentDescription = null,
-            placeholder = ColorPainter(MaterialTheme.colorScheme.primary), // todo
-            error = ColorPainter(MaterialTheme.colorScheme.primary), // todo
-            fallback = ColorPainter(MaterialTheme.colorScheme.primary), // todo
+            loading = {
+                Box(imageModifier.then(Modifier.background(shimmerBrush(targetValue = 1300f))))
+            },
+            error = {
+                Box(imageModifier.then(Modifier.background(MaterialTheme.colorScheme.primary)))
+            },
             contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .padding(horizontal = 16.dp)
-                .height(350.dp)
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(75.dp))
+            modifier = imageModifier.then(Modifier.clip(RoundedCornerShape(75.dp)))
         )
 
         Spacer(modifier = Modifier.size(16.dp))

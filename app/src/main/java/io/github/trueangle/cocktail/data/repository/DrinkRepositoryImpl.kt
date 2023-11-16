@@ -1,9 +1,10 @@
-package io.github.trueangle.cocktail.data
+package io.github.trueangle.cocktail.data.repository
 
 import android.util.Log
 import com.github.kittinunf.result.Result
 import com.github.kittinunf.result.isSuccess
 import com.github.kittinunf.result.map
+import io.github.trueangle.cocktail.data.DrinksApi
 import io.github.trueangle.cocktail.data.api.model.toDomainModels
 import io.github.trueangle.cocktail.data.api.model.toEntityList
 import io.github.trueangle.cocktail.data.db.DrinkDao
@@ -29,9 +30,6 @@ class DrinkRepositoryImpl @Inject constructor(
     private val api: DrinksApi,
     private val drinkDao: DrinkDao
 ) : DrinkRepository {
-    override suspend fun getCategories() = resultBodyOf {
-        api.getCategories().toDomainModels()
-    }
 
     override suspend fun getByCategoryName(name: String) =
         resultBodyOf {

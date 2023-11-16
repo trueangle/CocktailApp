@@ -1,11 +1,13 @@
 package io.github.trueangle.cocktail.ui.search
 
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -28,7 +30,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -36,11 +37,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.compose.AsyncImage
+import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import io.github.trueangle.cocktail.CocktailApplication
 import io.github.trueangle.cocktail.design.EmptyView
 import io.github.trueangle.cocktail.design.ErrorView
+import io.github.trueangle.cocktail.design.shimmerBrush
 import io.github.trueangle.cocktail.domain.model.Drink
 import io.github.trueangle.cocktail.domain.model.SearchSource
 import io.github.trueangle.cocktail.util.viewModelFactory
@@ -50,10 +52,10 @@ import io.github.trueangle.cocktail.util.viewModelFactory
 fun Search(
     modifier: Modifier = Modifier,
     onItemClick: (Drink) -> Unit,
-    source: SearchSource
+    source: SearchSource,
+    placeholder: String
 ) {
     val appComponent = (LocalContext.current.applicationContext as CocktailApplication).appComponent
-
     val vm = viewModel<SearchViewModel>(
         key = "searchViewModel${source.name}",
         factory = viewModelFactory {
@@ -62,33 +64,32 @@ fun Search(
 
     val state by vm.stateFlow.collectAsStateWithLifecycle()
 
+    val barPadding by animateDpAsState(
+        if (state.active) 0.dp else 16.dp,
+        tween(300),
+        label = "SearchBarPaddingAnim"
+    )
+
     SearchBar(
         query = state.query,
-        onQueryChange = {
-            vm.dispatch(SearchIntent.Search(it))
-        },
-        placeholder = { Text(text = "Search cocktail by name") },
+        onQueryChange = { vm.dispatch(SearchIntent.Search(it)) },
+        placeholder = { Text(text = placeholder) },
         trailingIcon = {
             if (state.active) {
                 Icon(
-                    modifier = Modifier.clickable {
-                        vm.dispatch(SearchIntent.OnClear)
-                    },
+                    modifier = Modifier.clickable { vm.dispatch(SearchIntent.OnClear) },
                     imageVector = Icons.Default.Close,
                     contentDescription = "Close search"
                 )
             }
         },
-        onSearch = {
-            vm.dispatch(SearchIntent.Search(it))
-        },
+        onSearch = { vm.dispatch(SearchIntent.Search(it)) },
         active = state.active,
-        onActiveChange = {
-            vm.dispatch(SearchIntent.ToggleSearch(it))
-        },
-        modifier = Modifier
+        onActiveChange = { vm.dispatch(SearchIntent.ToggleSearch(it)) },
+        modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = if (state.active) 0.dp else 16.dp)
+            .padding(horizontal = barPadding)
+            .padding(bottom = if (state.active) 0.dp else 8.dp)
     ) {
         when {
             state.progress -> {
@@ -97,8 +98,7 @@ fun Search(
                     contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator(
-                        modifier = Modifier
-                            .size(42.dp),
+                        modifier = Modifier.size(42.dp),
                         color = MaterialTheme.colorScheme.primary
                     )
                 }
@@ -141,16 +141,27 @@ private fun SearchItem(modifier: Modifier, drink: Drink, onClick: (Drink) -> Uni
         )
     ) {
         Row(modifier = modifier.padding(16.dp)) {
-            AsyncImage(
+            SubcomposeAsyncImage(
                 model = ImageRequest
                     .Builder(LocalContext.current)
                     .data(drink.thumbUrl)
                     .crossfade(true)
                     .build(),
                 contentDescription = null,
-                placeholder = ColorPainter(MaterialTheme.colorScheme.primary), // todo
-                error = ColorPainter(MaterialTheme.colorScheme.primary), // todo
-                fallback = ColorPainter(MaterialTheme.colorScheme.primary), // todo
+                loading = {
+                    Box(
+                        Modifier
+                            .size(50.dp)
+                            .background(shimmerBrush(targetValue = 1300f))
+                    )
+                },
+                error = {
+                    Box(
+                        Modifier
+                            .size(50.dp)
+                            .background(MaterialTheme.colorScheme.primary)
+                    )
+                },
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.size(50.dp)
             )

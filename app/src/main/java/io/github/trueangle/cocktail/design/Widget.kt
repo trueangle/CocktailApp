@@ -1,5 +1,10 @@
 package io.github.trueangle.cocktail.design
 
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +24,9 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -100,9 +108,39 @@ fun EmptyView(modifier: Modifier, title: String, subtitle: String = "") {
                 modifier = Modifier.fillMaxWidth(),
                 text = title,
                 textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.titleMedium
             )
             Text(modifier = Modifier.fillMaxWidth(), text = subtitle, textAlign = TextAlign.Center)
         }
     }
 }
+
+@Composable
+fun shimmerBrush(showShimmer: Boolean = true, targetValue: Float = 1000f): Brush =
+    if (showShimmer) {
+        val shimmerColors = listOf(
+            Color.LightGray.copy(alpha = 0.5f),
+            Color.LightGray.copy(alpha = 0.2f),
+            Color.LightGray.copy(alpha = 0.5f),
+        )
+
+        val transition = rememberInfiniteTransition(label = "")
+        val translateAnimation = transition.animateFloat(
+            initialValue = 0f,
+            targetValue = targetValue,
+            animationSpec = infiniteRepeatable(
+                animation = tween(800), repeatMode = RepeatMode.Reverse
+            ), label = ""
+        )
+        Brush.linearGradient(
+            colors = shimmerColors,
+            start = Offset.Zero,
+            end = Offset(x = translateAnimation.value, y = translateAnimation.value)
+        )
+    } else {
+        Brush.linearGradient(
+            colors = listOf(Color.Transparent, Color.Transparent),
+            start = Offset.Zero,
+            end = Offset.Zero
+        )
+    }

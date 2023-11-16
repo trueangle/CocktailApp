@@ -7,9 +7,11 @@ import dagger.Binds
 import dagger.Component
 import dagger.Module
 import dagger.Provides
-import io.github.trueangle.cocktail.data.DrinkRepositoryImpl
 import io.github.trueangle.cocktail.data.DrinksApi
 import io.github.trueangle.cocktail.data.db.DrinksDatabase
+import io.github.trueangle.cocktail.data.repository.CategoryRepositoryImpl
+import io.github.trueangle.cocktail.data.repository.DrinkRepositoryImpl
+import io.github.trueangle.cocktail.domain.repository.CategoryRepository
 import io.github.trueangle.cocktail.domain.repository.DrinkRepository
 import io.github.trueangle.cocktail.ui.AppViewModelFactory
 import kotlinx.serialization.json.Json
@@ -44,7 +46,10 @@ interface AppComponent {
 @Module
 interface AppModule {
     @[Binds Singleton]
-    fun bindDrinkRepos(impl: DrinkRepositoryImpl): DrinkRepository
+    fun bindDrinkRepo(impl: DrinkRepositoryImpl): DrinkRepository
+
+    @[Binds Singleton]
+    fun bindCategoryRepo(impl: CategoryRepositoryImpl): CategoryRepository
 
     companion object {
         @[Provides Singleton]

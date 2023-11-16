@@ -7,6 +7,7 @@ import com.github.kittinunf.result.onSuccess
 import io.github.trueangle.cocktail.domain.model.Category
 import io.github.trueangle.cocktail.domain.model.Drink
 import io.github.trueangle.cocktail.domain.model.RequestException
+import io.github.trueangle.cocktail.domain.repository.CategoryRepository
 import io.github.trueangle.cocktail.domain.repository.DrinkRepository
 import io.github.trueangle.cocktail.util.Intent
 import io.github.trueangle.cocktail.util.Effect
@@ -32,7 +33,7 @@ sealed interface CategoriesEffect : Effect
 
 class CategoriesViewModel(
     private val savedStateHandle: SavedStateHandle,
-    private val drinkRepository: DrinkRepository,
+    private val categoryRepository: CategoryRepository,
     private val reducer: CategoriesScreenReducer = CategoriesScreenReducer(),
 ) : MviViewModel<CategoriesState, CategoriesIntent, CategoriesEffect>() {
 
@@ -52,7 +53,7 @@ class CategoriesViewModel(
         viewState = viewState.copy(progress = true, error = null)
         viewModelScope.launch(Dispatchers.IO) {
 
-            drinkRepository.getCategories()
+            categoryRepository.getCategories()
                 .onSuccess {
                     viewState = reducer.reduceCategories(viewState, it)
                 }.onFailure {

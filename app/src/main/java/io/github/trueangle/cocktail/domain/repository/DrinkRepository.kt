@@ -8,8 +8,6 @@ import io.github.trueangle.cocktail.domain.model.SearchSource
 import kotlinx.coroutines.flow.Flow
 
 interface DrinkRepository {
-    suspend fun getCategories(): Result<List<Category>, RequestException>
-
     suspend fun getByCategoryName(name: String): Result<List<Drink>, RequestException>
 
     fun getById(id: String): Flow<Result<Drink, RequestException>>

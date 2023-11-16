@@ -1,5 +1,6 @@
 package io.github.trueangle.cocktail.ui.drinks
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,16 +33,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.AsyncImage
+import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import io.github.trueangle.cocktail.design.AppBar
 import io.github.trueangle.cocktail.design.ErrorView
+import io.github.trueangle.cocktail.design.shimmerBrush
 import io.github.trueangle.cocktail.domain.model.Drink
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -119,6 +120,10 @@ private fun Content(
 
 @Composable
 fun DrinkListItem(modifier: Modifier, Drink: Drink, onItemClick: (Drink) -> Unit) {
+    val imageModifier = Modifier
+        .height(200.dp)
+        .fillMaxWidth()
+
     Card(
         modifier = modifier.clickable { onItemClick(Drink) },
         colors = CardDefaults.cardColors(
@@ -126,21 +131,21 @@ fun DrinkListItem(modifier: Modifier, Drink: Drink, onItemClick: (Drink) -> Unit
         )
     ) {
         Column {
-            AsyncImage(
+            SubcomposeAsyncImage(
                 model = ImageRequest
                     .Builder(LocalContext.current)
                     .data(Drink.thumbUrl)
                     .crossfade(true)
                     .build(),
                 contentDescription = null,
-                placeholder = ColorPainter(MaterialTheme.colorScheme.primary), // todo
-                error = ColorPainter(MaterialTheme.colorScheme.primary), // todo
-                fallback = ColorPainter(MaterialTheme.colorScheme.primary), // todo
+                loading = {
+                    Box(imageModifier.then(Modifier.background(shimmerBrush(targetValue = 1300f))))
+                },
+                error = {
+                    Box(imageModifier.then(Modifier.background(MaterialTheme.colorScheme.primary)))
+                },
                 contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .height(200.dp)
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
+                modifier = imageModifier.then(Modifier.clip(RoundedCornerShape(12.dp)))
             )
 
             Row(

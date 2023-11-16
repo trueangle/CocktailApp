@@ -1,6 +1,5 @@
 package io.github.trueangle.cocktail.ui.search
 
-import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.github.kittinunf.result.onFailure
 import com.github.kittinunf.result.onSuccess
@@ -69,7 +68,9 @@ class SearchViewModel(
     }
 
     private fun search(query: String) {
-        if (query.isEmpty()) {
+        val name = query.trim()
+
+        if (name.isEmpty()) {
             viewState = viewState.copy(searchResults = persistentListOf())
 
             return
@@ -79,7 +80,7 @@ class SearchViewModel(
 
         viewModelScope.launch(Dispatchers.IO) {
             drinkRepository
-                .searchByName(query, source)
+                .searchByName(name, source)
                 .onSuccess { results ->
                     viewState = viewState.copy(
                         progress = false,

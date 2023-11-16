@@ -1,6 +1,5 @@
 package io.github.trueangle.cocktail.ui.home
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -12,10 +11,8 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -34,15 +31,32 @@ import io.github.trueangle.cocktail.ui.drinks.DrinksScreen
 import io.github.trueangle.cocktail.ui.favorites.FavoritesScreen
 import io.github.trueangle.cocktail.util.encodeUrl
 
-enum class HomeRoutes(val route: String) {
-    CategoriesNavigation("home/categories"),
-    Categories("home/categories/screen"),
-    Drinks("home/drinks/{categoryName}"),
-    DrinkDetail("home/drink/{id}"),
-    Favorites("home/favorites"),
+sealed class HomeRoutes {
+    data object CategoriesNavigation : HomeRoutes() {
+        const val RoutePattern: String = "home/categories"
+    }
+
+    data object Categories : HomeRoutes() {
+        const val RoutePattern: String = "home/categories/screen"
+    }
+
+    data object Drinks : HomeRoutes() {
+        const val RoutePattern: String = "home/categories/drinks/{categoryName}"
+
+        fun routeWithParam(categoryName: String) = "home/categories/drinks/${categoryName.encodeUrl()}"
+    }
+
+    data object DrinkDetail : HomeRoutes() {
+        const val RoutePattern: String = "home/drink/{id}"
+
+        fun routeWithParam(drinkId: String) = "home/drink/${drinkId}"
+    }
+
+    data object Favorites : HomeRoutes() {
+        const val RoutePattern: String = "home/favorites"
+    }
 }
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun HomeScreen(modifier: Modifier, appViewModelFactory: AppViewModelFactory) {
     val navController = rememberNavController()
@@ -55,29 +69,28 @@ fun HomeScreen(modifier: Modifier, appViewModelFactory: AppViewModelFactory) {
         NavHost(
             modifier = Modifier.padding(bottom = it.calculateBottomPadding()),
             navController = navController,
-            startDestination = HomeRoutes.CategoriesNavigation.route
+            startDestination = HomeRoutes.CategoriesNavigation.RoutePattern
         ) {
 
             navigation(
-                startDestination = HomeRoutes.Categories.route,
-                route = HomeRoutes.CategoriesNavigation.route
+                startDestination = HomeRoutes.Categories.RoutePattern,
+                route = HomeRoutes.CategoriesNavigation.RoutePattern
             ) {
-                composable(route = HomeRoutes.Categories.route) {
+                composable(route = HomeRoutes.Categories.RoutePattern) {
                     CategoriesScreen(
                         modifier = Modifier.fillMaxSize(),
                         vm = viewModel(factory = appViewModelFactory),
                         onItemClick = { cat ->
-                            // todo
-                            navController.navigate("home/drinks/${cat.name.encodeUrl()}")
+                            navController.navigate(HomeRoutes.Drinks.routeWithParam(cat.name))
                         },
                         onSearchItemClick = { drink ->
-                            navController.navigate("home/drink/${drink.id}")
+                            navController.navigate(HomeRoutes.DrinkDetail.routeWithParam(drink.id))
                         }
                     )
                 }
 
                 composable(
-                    route = HomeRoutes.DrinkDetail.route,
+                    route = HomeRoutes.DrinkDetail.RoutePattern,
                     arguments = listOf(navArgument("id") { type = NavType.StringType })
                 ) {
                     DrinkDetailScreen(
@@ -89,25 +102,24 @@ fun HomeScreen(modifier: Modifier, appViewModelFactory: AppViewModelFactory) {
                 }
             }
 
-            composable(route = HomeRoutes.Favorites.route) {
+            composable(route = HomeRoutes.Favorites.RoutePattern) {
                 FavoritesScreen(
                     modifier = Modifier.fillMaxSize(),
                     vm = viewModel(factory = appViewModelFactory),
                 ) { drink ->
-                    navController.navigate("home/drink/${drink.id}")
+                    navController.navigate(HomeRoutes.DrinkDetail.routeWithParam(drink.id))
                 }
             }
 
             composable(
-                route = HomeRoutes.Drinks.route,
+                route = HomeRoutes.Drinks.RoutePattern,
                 arguments = listOf(navArgument("categoryName") { type = NavType.StringType })
             ) {
                 DrinksScreen(
                     modifier = Modifier.fillMaxSize(),
                     vm = viewModel(factory = appViewModelFactory),
                     onItemClick = { drink ->
-                        // todo
-                        navController.navigate("home/drink/${drink.id}")
+                        navController.navigate(HomeRoutes.DrinkDetail.routeWithParam(drink.id))
                     },
                     onNavUp = navController::popBackStack
                 )
@@ -125,9 +137,9 @@ private fun HomeBottomBar(navController: NavController) {
     NavigationBar {
         NavigationBarItem(
             icon = { Icon(imageVector = Icons.Outlined.List, contentDescription = null) },
-            selected = destination?.route?.contains("home/categories") == true,
+            selected = destination?.hierarchy?.any { it.route?.contains("home/categories") == true } == true,
             onClick = {
-                navController.navigate(HomeRoutes.CategoriesNavigation.route) {
+                navController.navigate(HomeRoutes.CategoriesNavigation.RoutePattern) {
                     popUpTo(navController.graph.findStartDestination().id) {
                         saveState = true
                     }
@@ -139,9 +151,9 @@ private fun HomeBottomBar(navController: NavController) {
         )
         NavigationBarItem(
             icon = { Icon(imageVector = Icons.Outlined.Star, contentDescription = null) },
-            selected = destination?.hierarchy?.any { it.route == HomeRoutes.Favorites.route } == true,
+            selected = destination?.hierarchy?.any { it.route == HomeRoutes.Favorites.RoutePattern } == true,
             onClick = {
-                navController.navigate(HomeRoutes.Favorites.route) {
+                navController.navigate(HomeRoutes.Favorites.RoutePattern) {
                     popUpTo(navController.graph.findStartDestination().id) {
                         saveState = true
                     }

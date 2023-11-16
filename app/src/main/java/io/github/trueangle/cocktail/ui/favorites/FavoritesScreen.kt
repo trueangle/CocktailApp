@@ -12,26 +12,21 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import io.github.trueangle.cocktail.design.AppBar
 import io.github.trueangle.cocktail.domain.model.Drink
 import io.github.trueangle.cocktail.domain.model.SearchSource
 import io.github.trueangle.cocktail.ui.drinks.DrinkListItem
 import io.github.trueangle.cocktail.ui.search.Search
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FavoritesScreen(
     modifier: Modifier,
@@ -39,11 +34,13 @@ fun FavoritesScreen(
     onItemClick: (Drink) -> Unit
 ) {
     val state by vm.stateFlow.collectAsStateWithLifecycle()
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
-    Scaffold(modifier = modifier/*.nestedScroll(scrollBehavior.nestedScrollConnection)*/, topBar = {
-        //AppBar(title = "Favorites", scrollBehavior = scrollBehavior)
-        Search(onItemClick = onItemClick, source = SearchSource.LOCAL)
+    Scaffold(modifier = modifier, topBar = {
+        Search(
+            onItemClick = onItemClick,
+            source = SearchSource.LOCAL,
+            placeholder = "Search cocktail in favorites"
+        )
     }) {
         if (state.list.isEmpty()) {
             Box(
@@ -83,7 +80,7 @@ fun FavoritesScreen(
                 item(span = {
                     GridItemSpan(2)
                 }) {
-                    Spacer (modifier = Modifier.size(2.dp))
+                    Spacer(modifier = Modifier.size(2.dp))
                 }
 
                 items(state.list, key = { item -> item.id }) { drink ->

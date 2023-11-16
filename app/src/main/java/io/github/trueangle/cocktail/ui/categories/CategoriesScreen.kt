@@ -44,7 +44,11 @@ fun CategoriesScreen(
     val state by vm.stateFlow.collectAsStateWithLifecycle()
 
     Scaffold(modifier = modifier, topBar = {
-        Search(onItemClick = onSearchItemClick, source = SearchSource.NETWORK)
+        Search(
+            onItemClick = onSearchItemClick,
+            source = SearchSource.NETWORK,
+            placeholder = "Search cocktail by name"
+        )
     }) {
         Content(
             modifier = Modifier

@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.CreationExtras
+import io.github.trueangle.cocktail.domain.repository.CategoryRepository
 import io.github.trueangle.cocktail.domain.repository.DrinkRepository
 import io.github.trueangle.cocktail.ui.categories.CategoriesViewModel
 import io.github.trueangle.cocktail.ui.drinkdetail.DrinkDetailViewModel
@@ -15,7 +16,8 @@ import javax.inject.Singleton
 
 @[Singleton Immutable]
 class AppViewModelFactory @Inject constructor(
-    private val drinkRepository: DrinkRepository
+    private val drinkRepository: DrinkRepository,
+    private val categoryRepository: CategoryRepository
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T = when {
         modelClass.isAssignableFrom(DrinksViewModel::class.java) -> DrinksViewModel(
@@ -34,7 +36,7 @@ class AppViewModelFactory @Inject constructor(
 
         else -> CategoriesViewModel(
             savedStateHandle = extras.createSavedStateHandle(),
-            drinkRepository = drinkRepository
+            categoryRepository = categoryRepository
         ) as T
     }
 }
