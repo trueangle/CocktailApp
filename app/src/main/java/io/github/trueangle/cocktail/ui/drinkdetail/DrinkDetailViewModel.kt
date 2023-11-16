@@ -31,7 +31,7 @@ sealed interface DrinkDetailIntent : Intent {
 }
 
 sealed interface DrinkDetailEffect : Effect {
-
+    class AddedToFavorites(val isAdded: Boolean) : DrinkDetailEffect
 }
 
 class DrinkDetailViewModel(
@@ -51,7 +51,9 @@ class DrinkDetailViewModel(
         when (intent) {
             DrinkDetailIntent.OnFavoriteClick -> viewModelScope.launch {
                 val drink = viewState.drink ?: return@launch
-                drinkRepository.update(drink.copy(favorite = !drink.favorite))
+                val favorite = !drink.favorite
+                drinkRepository.update(drink.copy(favorite = favorite))
+                effectChannel.trySend(DrinkDetailEffect.AddedToFavorites(favorite))
             }
 
             DrinkDetailIntent.OnRetry -> getDrink()

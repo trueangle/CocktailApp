@@ -1,5 +1,6 @@
 package io.github.trueangle.cocktail.ui.drinkdetail
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,6 +38,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -57,12 +59,27 @@ import io.github.trueangle.cocktail.design.ErrorView
 import io.github.trueangle.cocktail.design.shimmerBrush
 import io.github.trueangle.cocktail.domain.model.Drink
 import io.github.trueangle.cocktail.domain.model.Ingredient
+import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DrinkDetailScreen(modifier: Modifier, vm: DrinkDetailViewModel, onNavUp: () -> Unit) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val state by vm.stateFlow.collectAsStateWithLifecycle()
+
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        vm.effectFlow.collect {
+            when (it) {
+                is DrinkDetailEffect.AddedToFavorites -> Toast.makeText(
+                    context,
+                    if (it.isAdded) "Added to favorites" else "Removed from favorites",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
 
     Scaffold(
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -85,7 +102,9 @@ fun DrinkDetailScreen(modifier: Modifier, vm: DrinkDetailViewModel, onNavUp: () 
                         Icon(
                             imageVector = Icons.Outlined.Star,
                             contentDescription = null,
-                            tint = if (state.drink?.favorite == true) MaterialTheme.colorScheme.primary else Color.Gray.copy(alpha = 0.6F)
+                            tint = if (state.drink?.favorite == true) MaterialTheme.colorScheme.primary else Color.Gray.copy(
+                                alpha = 0.6F
+                            )
                         )
                     }
                 }

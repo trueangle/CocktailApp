@@ -14,7 +14,7 @@ interface Effect
 
 @Stable
 abstract class MviViewModel<S : State, I : Intent, E : Effect>() : ViewModel() {
-    private val effectChannel = Channel<E>(Channel.CONFLATED)
+    protected val effectChannel = Channel<E>(Channel.CONFLATED)
 
     protected abstract val initialState: S
     private val mutableStateFlow by lazy { MutableStateFlow(initialState) }
@@ -25,7 +25,7 @@ abstract class MviViewModel<S : State, I : Intent, E : Effect>() : ViewModel() {
             mutableStateFlow.value = value
         }
 
-    val effectFlow: Flow<Effect> = effectChannel.receiveAsFlow()
+    val effectFlow: Flow<E> = effectChannel.receiveAsFlow()
     val stateFlow: StateFlow<S> get() = mutableStateFlow
 
     open fun dispatch(intent: I) {}
