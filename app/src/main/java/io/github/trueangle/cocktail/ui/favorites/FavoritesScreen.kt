@@ -52,7 +52,8 @@ fun FavoritesScreen(
                         .fillMaxWidth()
                         .padding(horizontal = 32.dp),
                     text = "Favorite cocktails will appear here",
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onBackground
                 )
             }
         } else {

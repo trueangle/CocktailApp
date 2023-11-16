@@ -26,7 +26,8 @@ data class SearchState(
     val query: String = "",
     val searchResults: ImmutableList<Drink> = persistentListOf(),
     val progress: Boolean = false,
-    val error: RequestException? = null
+    val error: RequestException? = null,
+    val searchHappened: Boolean = false
 ) : State
 
 sealed interface SearchIntent : Intent {
@@ -62,6 +63,7 @@ class SearchViewModel(
                 viewState = viewState.copy(query = intent.query)
                 searchInput.value = intent.query
             }
+
             is SearchIntent.ToggleSearch -> toggleSearch(intent.active)
             SearchIntent.OnClear -> clearSearch()
         }
@@ -85,13 +87,15 @@ class SearchViewModel(
                     viewState = viewState.copy(
                         progress = false,
                         error = null,
-                        searchResults = results.toPersistentList()
+                        searchResults = results.toPersistentList(),
+                        searchHappened = true
                     )
                 }.onFailure {
                     viewState = viewState.copy(
                         progress = false,
                         error = it,
-                        searchResults = persistentListOf()
+                        searchResults = persistentListOf(),
+                        searchHappened = true
                     )
                 }
         }

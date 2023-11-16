@@ -113,7 +113,7 @@ fun Search(
             state.searchResults.isEmpty() -> {
                 EmptyView(
                     modifier = Modifier.fillMaxSize(),
-                    title = "No data found"
+                    title = if (state.searchHappened) "No data found" else ""
                 )
             }
 

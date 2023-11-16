@@ -108,9 +108,10 @@ fun EmptyView(modifier: Modifier, title: String, subtitle: String = "") {
                 modifier = Modifier.fillMaxWidth(),
                 text = title,
                 textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSecondaryContainer
             )
-            Text(modifier = Modifier.fillMaxWidth(), text = subtitle, textAlign = TextAlign.Center)
+            Text(modifier = Modifier.fillMaxWidth(), text = subtitle, textAlign = TextAlign.Center, color = MaterialTheme.colorScheme.onSecondaryContainer)
         }
     }
 }
