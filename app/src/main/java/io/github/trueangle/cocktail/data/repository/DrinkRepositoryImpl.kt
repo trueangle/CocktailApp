@@ -60,7 +60,6 @@ class DrinkRepositoryImpl @Inject constructor(
         drinkDao
             .getById(id)
             .flatMapLatest {
-                Log.d("Entity", it.toString())
 
                 if (it != null) {
                     flow {
