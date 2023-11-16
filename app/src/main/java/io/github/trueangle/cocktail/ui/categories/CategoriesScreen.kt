@@ -69,17 +69,15 @@ private fun Content(
     onItemClick: (Category) -> Unit
 ) {
     when {
-        state.progress -> {
-            Box(
-                modifier = modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(
-                    modifier = Modifier
-                        .size(42.dp),
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
+        state.progress -> Box(
+            modifier = modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .size(42.dp),
+                color = MaterialTheme.colorScheme.primary
+            )
         }
 
         state.error != null -> ErrorView(
