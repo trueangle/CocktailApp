@@ -41,11 +41,11 @@ sealed interface SearchEffect : Effect
 @OptIn(FlowPreview::class)
 class SearchViewModel(
     private val drinkRepository: DrinkRepository,
-    private val source: SearchSource
+    private val source: SearchSource,
+    override val initialState: SearchState = SearchState()
 ) : MviViewModel<SearchState, SearchIntent, SearchEffect>() {
 
     private val searchInput = MutableStateFlow("")
-    override fun setInitialState() = SearchState()
 
     init {
         viewModelScope.launch {

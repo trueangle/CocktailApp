@@ -41,8 +41,7 @@ class DrinkDetailViewModel(
 
     private var job: Job? = null
 
-    override fun setInitialState(): DrinkDetailState =
-        DrinkDetailState(requireNotNull(savedStateHandle["id"]))
+    override val initialState = DrinkDetailState(requireNotNull(savedStateHandle["id"]))
 
     init {
         getDrink()

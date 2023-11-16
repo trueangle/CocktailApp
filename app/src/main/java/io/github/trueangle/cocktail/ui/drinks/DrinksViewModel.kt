@@ -31,19 +31,16 @@ sealed interface DrinksIntent : Intent {
     data object OnRetry : DrinksIntent
 }
 
-sealed interface DrinksEffect : Effect {
-
-}
+sealed interface DrinksEffect : Effect
 
 class DrinksViewModel(
     private val savedStateHandle: SavedStateHandle,
     private val drinkRepository: DrinkRepository
 ) : MviViewModel<DrinksState, DrinksIntent, DrinksEffect>() {
 
-    override fun setInitialState(): DrinksState {
-        val categoryName = requireNotNull(savedStateHandle["categoryName"]) as String
-        return DrinksState(categoryName = categoryName.decodeUrl())
-    }
+    override val initialState = DrinksState(
+        categoryName = (requireNotNull(savedStateHandle["categoryName"]) as String).decodeUrl()
+    )
 
     init {
         getDrinks()

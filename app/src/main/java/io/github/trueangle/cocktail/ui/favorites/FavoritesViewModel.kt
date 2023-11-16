@@ -22,16 +22,13 @@ sealed interface DrinksIntent : Intent
 sealed interface DrinksEffect : Effect
 
 class FavoritesViewModel(
-    private val drinkRepository: DrinkRepository
+    private val drinkRepository: DrinkRepository,
+    override val initialState: FavoritesState = FavoritesState()
 ) : MviViewModel<FavoritesState, DrinksIntent, DrinksEffect>() {
-
-    override fun setInitialState(): FavoritesState = FavoritesState()
 
     init {
         getFavorites()
     }
-
-    override fun dispatch(intent: DrinksIntent) {}
 
     private fun getFavorites() {
         drinkRepository

@@ -35,13 +35,12 @@ class CategoriesViewModel(
     private val savedStateHandle: SavedStateHandle,
     private val categoryRepository: CategoryRepository,
     private val reducer: CategoriesScreenReducer = CategoriesScreenReducer(),
+    override val initialState: CategoriesState = CategoriesState(),
 ) : MviViewModel<CategoriesState, CategoriesIntent, CategoriesEffect>() {
 
     init {
         loadData()
     }
-
-    override fun setInitialState() = CategoriesState()
 
     override fun dispatch(intent: CategoriesIntent) {
         when (intent) {
